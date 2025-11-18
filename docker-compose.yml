@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: nutritrack-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: nutritrack
+    networks:
+      - nutritrack-network
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nutritrack-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://admin:admin123@mongodb:27017/nutritrack?authSource=admin
+      JWT_SECRET: your_secret_key_change_this
+      JWT_EXPIRE: 7d
+      ML_SERVICE_URL: http://ml-service:8000
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      - mongodb
+      - ml-service
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - nutritrack-network
+
+  # ML Service
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: nutritrack-ml
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    networks:
+      - nutritrack-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  nutritrack-network:
+    driver: bridge

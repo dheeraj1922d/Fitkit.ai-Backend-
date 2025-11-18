@@ -1,0 +1,210 @@
+{
+  "info": {
+    "name": "NutriTrack AI API",
+    "description": "Complete API collection for NutriTrack AI Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"age\": 28,\n  \"weight\": 75,\n  \"height\": 175,\n  \"gender\": \"male\",\n  \"activityLevel\": \"moderate\",\n  \"goal\": \"loss\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.token) {",
+                  "    pm.environment.set(\"token\", jsonData.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/auth/profile"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/auth/profile",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 74,\n  \"goal\": \"maintain\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Meals",
+      "item": [
+        {
+          "name": "Upload Meal Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/meal/upload-image",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Meal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/meal/add",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mealType\": \"lunch\",\n  \"items\": [\n    {\n      \"food\": \"Chicken Breast\",\n      \"quantity_g\": 150,\n      \"calories\": 248,\n      \"protein\": 46.5,\n      \"carbs\": 0,\n      \"fat\": 5.4\n    },\n    {\n      \"food\": \"Rice\",\n      \"quantity_g\": 200,\n      \"calories\": 260,\n      \"protein\": 5.4,\n      \"carbs\": 57.6,\n      \"fat\": 0.6\n    }\n  ],\n  \"totalCalories\": 508\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Meals for Day",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/meal/day/2024-01-15"
+          }
+        },
+        {
+          "name": "Get Weekly Meals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/meal/week"
+          }
+        },
+        {
+          "name": "Search Food",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/meal/search?q=chicken"
+          }
+        },
+        {
+          "name": "Delete Meal",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/meal/MEAL_ID_HERE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Weekly Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/analytics/weekly"
+          }
+        },
+        {
+          "name": "Get Macro Distribution",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/analytics/macros?period=week"
+          }
+        },
+        {
+          "name": "Get AI Insights",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": "{{baseUrl}}/analytics/insights"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    }
+  ]
+}
